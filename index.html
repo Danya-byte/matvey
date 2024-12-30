@@ -9,35 +9,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@100..900&display=swap" rel="stylesheet">
   <style>
-    /* Стили для хэдера */
-    #userProfile {
-      display: flex;
-      flex-direction: row; /* Горизонтальное расположение */
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 1000;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 10px;
-      border-radius: 10px;
-      color: white;
-      align-items: center; /* Выравниваем элементы по центру вертикально */
-    }
-
-    #userAvatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: 2px solid white;
-      margin-right: 10px; /* Отступ между аватаркой и именем */
-    }
-
-    #userName {
-      font-family: Geologica;
-      font-size: 16px;
-      color: white;
-    }
-
     /* Остальные стили */
     body {
       touch-action: none;
@@ -104,12 +75,6 @@
   </style>
 </head>
 <body>
-  <!-- Хэдер с аватаркой и именем пользователя -->
-  <div id="userProfile">
-    <img id="userAvatar" src="" alt="User Avatar">
-    <div id="userName"></div>
-  </div>
-
   <center>
     <div>
       <form id="orderForm">
@@ -151,18 +116,6 @@
     const usernameInput = document.getElementById("Username");
     const usernameModal = document.getElementById("usernameModal");
     const checkUsernameButton = document.getElementById("checkUsernameButton");
-
-    // Получаем данные пользователя
-    const user_photo_url = window.Telegram.WebApp.initDataUnsafe?.user?.photo_url;
-    const firstName = window.Telegram.WebApp.initDataUnsafe?.user?.first_name || '';
-    const lastName = window.Telegram.WebApp.initDataUnsafe?.user?.last_name || '';
-
-    if (user_photo_url) {
-      document.getElementById("userAvatar").src = user_photo_url;
-    }
-    if (firstName || lastName) {
-      document.getElementById("userName").textContent = `${firstName} ${lastName}`.trim();
-    }
 
     // Обработчик для кнопки "Проверить"
     checkUsernameButton.addEventListener('click', () => {
