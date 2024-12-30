@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Merry Wish</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@100..900&display=swap" rel="stylesheet">
+  <style>
+    /* Стили для хэдера */
+    #userProfile {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.7); /* Темный фон */
+      padding: 10px;
+      border-radius: 10px;
+      color: white;
+      align-items: center;
+      gap: 10px; /* Расстояние между аватаркой и именем */
+    }
+
+    #userAvatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid white; /* Белая рамка для аватарки */
+    }
+
+    #userName {
+      font-family: Geologica;
+      font-size: 16px;
+      color: white; /* Белый цвет текста */
+    }
+
+    /* Остальные стили */
+    body {
+      touch-action: none;
+      background-image: url('https://media0.giphy.com/media/iqn1W7iaSzQZ9DuTPU/giphy.gif?cid=9b38fe916dnmwb69gl8ywlp93aat9pl0j936gucyhjrjlo7z&ep=v1_gifs_username&rid=giphy.gif&ct=g');
+      color: white;
+      overflow-y: hidden;
+      overflow-x: hidden;
+    }
+
+    input {
+      background-color: rgb(255, 255, 255);
+      border: none;
+      border-radius: 18px;
+      width: 95%;
+      height: 45px;
+      margin-top: 20px;
+      color: black;
+    }
+
+    h1 {
+      font-family: Geologica;
+      color: white;
+    }
+
+    img {
+      width: 105vw;
+      position: absolute;
+      margin-top: -100vw;
+      margin-left: -10px;
+    }
+
+    div {
+      margin-top: 160px;
+    }
+
+    button {
+      background-color: rgb(0, 136, 255);
+      border: none;
+      width: 98%;
+      height: 50px;
+      border-radius: 15px;
+      font-family: Geologica;
+      color: white;
+      margin-top: 10px;
+    }
+
+    button:active {
+      transform: translateY(5px);
+    }
+
+    #usernameModal button {
+      margin-top: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #usernameModal button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <!-- Хэдер с аватаркой и именем пользователя -->
+  <div id="userProfile">
+    <img id="userAvatar" src="" alt="User Avatar">
+    <span id="userName"></span>
+  </div>
+
+  <center>
+    <div>
+      <form id="orderForm">
+        <h1>Merry Wish</h1>
+        <input style="font-size: 16px;" id="Username" type="text" placeholder=" Ваш username" readonly><br>
+        <input style="font-size: 16px;" id="Пожелание" type="text" placeholder=" Ваше пожелание" required><br>
+        <button type="submit" id="send"><b>Отправить</b></button>
+      </form>
+    </div>
+  </center>
+
+  <!-- Модальное окно -->
+  <div id="usernameModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); color: white; justify-content: center; align-items: center; z-index: 1000;">
+    <div style="background: #333; padding: 20px; border-radius: 10px; text-align: center;">
+      <h2>У вас нет username</h2>
+      <p>Пожалуйста, установите username в настройках Telegram.</p>
+      <button id="checkUsernameButton">Проверить</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "API_KEY_HERE",
+        authDomain: "merry-wish.firebaseapp.com",
+        databaseURL: "https://merry-wish-default-rtdb.firebaseio.com",
+        projectId: "merry-wish",
+        storageBucket: "merry-wish.firebasestorage.app",
+        messagingSenderId: "472160350126",
+        appId: "1:472160350126:web:13ccce689eccd0106be23f",
+        measurementId: "G-2FV9T3RFY0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const orderForm = document.getElementById("orderForm");
+    const usernameInput = document.getElementById("Username");
+    const usernameModal = document.getElementById("usernameModal");
+    const checkUsernameButton = document.getElementById("checkUsernameButton");
+
+    // Проверяем наличие username и загружаем данные пользователя
+    if (window.Telegram.WebApp.initData) {
+      const initData = new URLSearchParams(window.Telegram.WebApp.initData);
+      const user = JSON.parse(initData.get('user'));
+      if (user) {
+        if (user.username) {
+          usernameInput.value = user.username; // Заполняем поле username
+          usernameModal.style.display = "none"; // Скрываем модальное окно
+          // Загружаем аватарку и имя пользователя
+          if (user.photo_url) {
+            document.getElementById("userAvatar").src = user.photo_url;
+          }
+          if (user.first_name || user.last_name) {
+            document.getElementById("userName").textContent = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+          }
+          document.getElementById("userProfile").style.display = "flex"; // Показываем хэдер
+        } else {
+          usernameModal.style.display = "flex"; // Показываем модальное окно
+        }
+      }
+    }
+
+    // Обработчик для кнопки "Проверить"
+    checkUsernameButton.addEventListener('click', () => {
+      if (checkUsername()) {
+        // Если username появился, разблокируем форму
+        orderForm.style.pointerEvents = "auto";
+        orderForm.style.opacity = "1";
+      }
+    });
+
+    orderForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const Пожелание = document.getElementById("Пожелание").value;
+        const Username = usernameInput.value;
+
+        if (Пожелание === "") {
+            showMessage("Пожалуйста, заполните поле пожелания!");
+            return;
+        }
+
+        try {
+            await set(ref(db, 'Пожелания/' + generateUUID()), { Пожелание, Username });
+            showMessage("Пожелание отправлено!");
+            orderForm.reset();
+        } catch (error) {
+            console.error("Ошибка при отправке пожелания:", error);
+            showMessage("Ошибка при отправке пожелания");
+        }
+    });
+
+    function generateUUID() {
+      return 'xx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
+    function showMessage(message) {
+      if (window.Telegram.WebApp) {
+        window.Telegram.WebApp.showAlert(message);
+      } else {
+        alert(message);
+      }
+    }
+  </script>
+</body>
+</html>
