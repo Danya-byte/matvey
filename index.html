@@ -11,7 +11,7 @@
   <style>
     /* Стили для хэдера */
     #userProfile {
-      display: none;
+      display: flex;
       position: fixed;
       top: 20px;
       left: 20px;
@@ -20,7 +20,7 @@
       padding: 10px;
       border-radius: 10px;
       color: white;
-      align-items: flex-start; /* Выравниваем элементы по верхнему краю */
+      align-items: center; /* Выравниваем элементы по центру вертикально */
     }
 
     #userAvatar {
@@ -28,14 +28,13 @@
       height: 40px;
       border-radius: 50%;
       border: 2px solid white;
-      margin-top: 10px; /* Аватарка чуть ниже */
+      margin-right: 10px; /* Отступ между аватаркой и именем */
     }
 
     #userName {
       font-family: Geologica;
       font-size: 16px;
       color: white;
-      margin-left: 10px; /* Отступ между аватаркой и именем */
     }
 
     /* Остальные стили */
@@ -163,7 +162,6 @@
     if (firstName || lastName) {
       document.getElementById("userName").textContent = `${firstName} ${lastName}`.trim();
     }
-    document.getElementById("userProfile").style.display = "flex";
 
     // Обработчик для кнопки "Проверить"
     checkUsernameButton.addEventListener('click', () => {
