@@ -16,26 +16,26 @@
       top: 20px;
       left: 20px;
       z-index: 1000;
-      background: rgba(0, 0, 0, 0.7); /* Темный фон */
+      background: rgba(0, 0, 0, 0.7);
       padding: 10px;
       border-radius: 10px;
       color: white;
-      align-items: center;
-      gap: 10px; /* Расстояние между аватаркой и именем */
+      align-items: flex-start; /* Выравниваем элементы по верхнему краю */
     }
 
     #userAvatar {
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      border: 2px solid white; /* Белая рамка для аватарки */
-      margin-top: 5px; /* Аватарка чуть ниже */
+      border: 2px solid white;
+      margin-top: 10px; /* Аватарка чуть ниже */
     }
 
     #userName {
       font-family: Geologica;
       font-size: 16px;
-      color: white; /* Белый цвет текста */
+      color: white;
+      margin-left: 10px; /* Отступ между аватаркой и именем */
     }
 
     /* Остальные стили */
@@ -107,7 +107,7 @@
   <!-- Хэдер с аватаркой и именем пользователя -->
   <div id="userProfile">
     <img id="userAvatar" src="" alt="User Avatar">
-    <span id="userName"></span>
+    <div id="userName"></div>
   </div>
 
   <center>
@@ -152,27 +152,18 @@
     const usernameModal = document.getElementById("usernameModal");
     const checkUsernameButton = document.getElementById("checkUsernameButton");
 
-    // Проверяем наличие username и загружаем данные пользователя
-    if (window.Telegram.WebApp.initData) {
-      const initData = new URLSearchParams(window.Telegram.WebApp.initData);
-      const user = JSON.parse(initData.get('user'));
-      if (user) {
-        if (user.username) {
-          usernameInput.value = user.username; // Заполняем поле username
-          usernameModal.style.display = "none"; // Скрываем модальное окно
-          // Загружаем аватарку и имя пользователя
-          if (user.photo_url) {
-            document.getElementById("userAvatar").src = user.photo_url;
-          }
-          if (user.first_name || user.last_name) {
-            document.getElementById("userName").textContent = `${user.first_name || ''} ${user.last_name || ''}`.trim();
-          }
-          document.getElementById("userProfile").style.display = "flex"; // Показываем хэдер
-        } else {
-          usernameModal.style.display = "flex"; // Показываем модальное окно
-        }
-      }
+    // Получаем данные пользователя
+    const user_photo_url = window.Telegram.WebApp.initDataUnsafe?.user?.photo_url;
+    const firstName = window.Telegram.WebApp.initDataUnsafe?.user?.first_name || '';
+    const lastName = window.Telegram.WebApp.initDataUnsafe?.user?.last_name || '';
+
+    if (user_photo_url) {
+      document.getElementById("userAvatar").src = user_photo_url;
     }
+    if (firstName || lastName) {
+      document.getElementById("userName").textContent = `${firstName} ${lastName}`.trim();
+    }
+    document.getElementById("userProfile").style.display = "flex";
 
     // Обработчик для кнопки "Проверить"
     checkUsernameButton.addEventListener('click', () => {
